@@ -8,7 +8,8 @@
 #define TOLUA_RELEASE
 #include "lua_bind.h"
 
-#include "aiengine_wraper.h"
+//#include "aiengine_wraper.h"
+#include "luaJson.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,7 +30,8 @@ int start(int argc, char **argv) {
         
     luaL_openlibs(L);
     luaopen_lua_bind(L);
-    lua_aiengine_wrapper(L);
+    //lua_aiengine_wrapper(L);
+    lua_open_json(L);
 
     if (luaL_loadfile(L, "test.lua") || lua_pcall(L, 0, 0, 0)) {
             const char *error = lua_tostring(L, -1);
