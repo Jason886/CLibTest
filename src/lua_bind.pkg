@@ -13,7 +13,9 @@ typedef struct {
         int nRead;
 } File_t;
 
+File_t *File_Load(char *path, char *mod);
 File_t *File_Open(char *path, char *mod, int bufSize);
 void File_Close(File_t *f);
 int File_Read(File_t *f);
 int File_Write(File_t *f, void *data, int nWrite);
+int File_WriteText(File_t *f, char *text);
