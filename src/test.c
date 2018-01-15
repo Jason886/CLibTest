@@ -15,22 +15,22 @@ int start(int argc, char **argv) {
     (void)argc;
     (void)argv;
 
-	lua_State *L = luaL_newstate();
-	if (!L) {
-		fprintf(stderr, "[ERR] luaL_newstate");
-		rc = -1;
-		goto end;
-	}
-	
+        lua_State *L = luaL_newstate();
+        if (!L) {
+                fprintf(stderr, "[ERR] luaL_newstate");
+                rc = -1;
+                goto end;
+        }
+        
     luaL_openlibs(L);
     luaopen_lua_bind(L);
 
     if (luaL_loadfile(L, "test.lua") || lua_pcall(L, 0, 0, 0)) {
-    	const char *error = lua_tostring(L, -1);
+            const char *error = lua_tostring(L, -1);
         fprintf(stderr, "[ERR] load test.lua: %s\n", error);
         lua_pop(L, 1);
         rc = -1;
-    	goto end;
+            goto end;
     }
 
 end:

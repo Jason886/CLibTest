@@ -11,10 +11,10 @@ void LOG(char *text);
 
 
 typedef struct {
-	FILE *fp;
-	void *readBuf;
-	int bufSize;
-	int nRead;
+        FILE *fp;
+        void *readBuf;
+        int bufSize;
+        int nRead;
 } File_t;
 
 File_t *File_Open(char *path, char *mod, int bufSize);

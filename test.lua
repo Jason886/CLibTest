@@ -18,12 +18,12 @@ end
 local Groups = require "cases/Groups"
 
 for i, v in ipairs(Groups) do
-	if v.run then
-		local ret = v:run()
-		if 0 ~= ret then
-			break
-		end
-	end
+        if v.run then
+                local ret = v:run()
+                if 0 ~= ret then
+                        break
+                end
+        end
 end
 
 
