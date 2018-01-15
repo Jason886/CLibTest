@@ -2,6 +2,7 @@
 #include "lualib.h"
 #include "lauxlib.h"
 #include "tolua.h"
+#define TOLUA_RELEASE
 #include "lua_bind.h"
 #include "test.h"
 
