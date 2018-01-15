@@ -12,6 +12,9 @@
 int start(int argc, char **argv) {
     int rc = 0;
 
+    (void)argc;
+    (void)argv;
+
 	lua_State *L = luaL_newstate();
 	if (!L) {
 		fprintf(stderr, "[ERR] luaL_newstate");
@@ -20,10 +23,7 @@ int start(int argc, char **argv) {
 	}
 	
     luaL_openlibs(L);
-
-    luaopen_bind(L);
-    
-    // tolua_export_lua_open(L);
+    luaopen_lua_bind(L);
 
     if (luaL_loadfile(L, "test.lua") || lua_pcall(L, 0, 0, 0)) {
     	const char *error = lua_tostring(L, -1);
@@ -93,7 +93,7 @@ int File_Read(File_t *f, int nRead) {
     if (!f) return -1;
     f->nRead = -1;
     memset(f->readBuf, 0, f->bufSize);
-    int rc = fread(f->readBuf, 1, f->bufSize, f->fp);
+    int rc = fread(f->readBuf, 1, nRead, f->fp);
     f->nRead = rc;
     return rc;
 }

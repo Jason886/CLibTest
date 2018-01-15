@@ -3,7 +3,7 @@
 HOST=`uname`
 if [ ${HOST} = Darwin ]; then
     TOLUA=../lib/tolua/macosx-x86_64/bin/tolua
-elif [ ${HOST} = Linix ]; then
+elif [ ${HOST} = Linux ]; then
     LONG_BIT=`getconf LONG_BIT`
     if [ ${LONG_BIT} = 64 ]; then
         TOLUA=../lib/tolua/linux-x86_64/bin/tolua

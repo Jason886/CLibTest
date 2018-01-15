@@ -17,6 +17,35 @@ function Usage()
 
 function build_lua_linux()
 {
+    local lua_top=
+    case ${ARCH} in
+        x86_64)
+            lua_top=${TARGET_ROOT}/lua/linux-x86_64
+            rm -rf ${lua_top}
+            rm -rf lua-${LUA_VERSION}/
+            tar zxvf lua-${LUA_VERSION}.tar.gz
+            pushd .
+            cd lua-${LUA_VERSION}/
+            make linux && make install INSTALL_TOP=${lua_top}
+            if [ $? -ne 0 ]; then echo "\033[31mBuild lua Failed !!\033[0m"; exit 1; fi
+            popd
+
+            tolua_top=${TARGET_ROOT}/tolua/linux-x86_64
+            mkdir -p ${tolua_top}
+            rm -rf tolua-${TOLUA_VERSION}/
+            tar zxvf tolua-${TOLUA_VERSION}.tar.gz
+            pushd .
+            cd tolua-${TOLUA_VERSION}/
+            sed -i "s/^LIB= /LIB= -ldl /g" config
+            make tolua LUA=${lua_top}
+            if [ $? -ne 0 ]; then echo -e "\033[31mBuild tolua Failed !!\033[0m"; exit 1; fi
+            cp -R -a include lib bin ${tolua_top} 
+            popd
+            ;;
+        *)
+            echo -e "\033[31mBuild For ${OS}, Unsupportted ARCH: ${ARCH} !!\033[0m"; Usage; exit 1;
+            ;;
+    esac
     echo 1
 }
 
@@ -47,7 +76,7 @@ function build_lua_macosx()
             popd
             ;;
         *)
-            echo -e "\033[31mBuild Macosx, Unsupportted ARCH: ${ARCH} !!\033[0m"; Usage; exit 1;
+            echo -e "\033[31mBuild for ${OS}, Unsupportted ARCH: ${ARCH} !!\033[0m"; Usage; exit 1;
             ;;
     esac
 }
