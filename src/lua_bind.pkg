@@ -19,3 +19,10 @@ void File_Close(File_t *f);
 int File_Read(File_t *f);
 int File_Write(File_t *f, void *data, int nWrite);
 int File_WriteText(File_t *f, char *text);
+
+
+struct aiengine * aiengine_new(const char *cfg);
+int aiengine_delete(struct aiengine *engine);
+int aiengine_start(struct aiengine *engine, const char *param, char id[64], aiengine_callback callback, const void *usrdata);
+int aiengine_feed(struct aiengine *engine, const void *data, int size);
+int aiengine_stop(struct aiengine *engine);
