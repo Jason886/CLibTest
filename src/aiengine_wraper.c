@@ -4,6 +4,7 @@
 #include "lualib.h"
 #include "lauxlib.h"
 #include "tolua.h"
+#include "cJSON.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -24,11 +25,35 @@ static int _callback(const void *usrdata, const char *id, int type, const void *
     cb_closure_t * cl = (cb_closure_t*) usrdata;
     aiengine_wraper_t *egn_w = cl->egn_w;
 
+    int rc = 0;
+    int eof = 0;
+
+    do {
+        if (type == AIENGINE_MESSAGE_TYPE_JSON) {
+            cJSON *j_root = cJSON_Parse(message);
+            if (j_root && j_root->type == cJSON_Object) {
+                cJSON *j_errId = cJSON_GetObjectItem(j_root, "errId");
+                if (j_errId && j_errId->type == cJSON_Number && j_errId->valueint != 0) {
+                    eof = 1;
+                    break;
+                }
+                cJSON *j_eof = cJSON_GetObjectItem(j_root, "eof");
+                if (j_eof && j_eof->type == cJSON_Number && j_eof->valueint == 1) {
+                    eof = 1;
+                    break;
+                }
+            } else {
+                eof = 1;
+                break;
+            }
+        }
+    } while(0);
+
     lua_State *L = lua_newthread(egn_w->L);
     if (!L) {
         fprintf(stderr, "[ERR] luaL_newstate");
-        free(cl);
-        return -1;
+        rc = -1;
+        goto end;
     }
 
     lua_rawgeti(L, LUA_REGISTRYINDEX, cl->cbRef);
@@ -38,24 +63,29 @@ static int _callback(const void *usrdata, const char *id, int type, const void *
     lua_pushlightuserdata(L, (void *)message);
     lua_pushnumber(L, size);
 
-    free(cl);
-    
     if (lua_pcall(L, 5, 1, 0)) {
         const char *err_msg = lua_tostring(L, -1);
         // !!! 标红显示
         fprintf(stderr, "%s\n", err_msg);
-        lua_pop(L, 1);
-        return -1;
+        rc = -1;
+        goto end;
     }
 
     if (!lua_isnumber(L, -1)) {
         lua_pop(L, 1);
-        return -1;
+        rc = -1;
+        goto end;
     }
 
-    int ret = lua_tonumber(L, -1);
+    rc = lua_tonumber(L, -1);
     lua_pop(L, 1);
-    return ret;
+end:
+    if (eof) {
+        luaL_unref(L, LUA_REGISTRYINDEX, cl->udRef);
+        luaL_unref(L, LUA_REGISTRYINDEX, cl->cbRef);
+        free(cl);
+    }
+    return rc;
 }
 
 static int _bind_aiengine_new(lua_State *L) {
