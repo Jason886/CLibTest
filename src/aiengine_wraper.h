@@ -7,7 +7,7 @@ extern "C" {
 
     #include "lua.h"
 
-    void lua_bind_aiengine(lua_State* L);
+    void lua_aiengine_wrapper(lua_State* L);
 
 #ifdef __cplusplus
 }

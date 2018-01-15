@@ -1,10 +1,14 @@
+#include "test.h"
+
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
 #include "tolua.h"
+
 #define TOLUA_RELEASE
 #include "lua_bind.h"
-#include "test.h"
+
+#include "aiengine_wraper.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,15 +20,16 @@ int start(int argc, char **argv) {
     (void)argc;
     (void)argv;
 
-        lua_State *L = luaL_newstate();
-        if (!L) {
-                fprintf(stderr, "[ERR] luaL_newstate");
-                rc = -1;
-                goto end;
-        }
+    lua_State *L = luaL_newstate();
+    if (!L) {
+            fprintf(stderr, "[ERR] luaL_newstate");
+            rc = -1;
+            goto end;
+    }
         
     luaL_openlibs(L);
     luaopen_lua_bind(L);
+    lua_aiengine_wrapper(L);
 
     if (luaL_loadfile(L, "test.lua") || lua_pcall(L, 0, 0, 0)) {
             const char *error = lua_tostring(L, -1);
