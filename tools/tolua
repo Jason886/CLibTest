@@ -1,0 +1,23 @@
+#!/bin/bash
+
+HOST=`uname`
+if [ ${HOST} = Darwin ]; then
+    TOLUA=../lib/tolua/macosx-x86_64/bin/tolua
+elif [ ${HOST} = Linix ]; then
+    LONG_BIT=`getconf LONG_BIT`
+    if [ ${LONG_BIT} = 64 ]; then
+        TOLUA=../lib/tolua/linux-x86_64/bin/tolua
+    else
+        TOLUA=../lib/tolua/linux-x86/bin/tolua
+    fi
+elif [ ${HOST} = Mingw32 ]; then
+    TOLUA=../lib/tolua/mingw-x86/bin/tolua
+elif [ ${HOST} = Mingw64 ]; then
+    TOLUA=../lib/tolua/mingw-x86_64/bin/tolua
+else
+    echo "cannot run at ${HOST}"
+    exit 1
+fi
+
+${TOLUA} $@
+
