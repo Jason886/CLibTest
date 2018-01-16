@@ -30,6 +30,7 @@ function build_lua_linux()
         x86_64)
             lua_top=${TARGET_ROOT}/lua/linux-x86_64
             rm -rf ${lua_top}
+            mkdir -p ${lua_top}
             rm -rf lua-${LUA_VERSION}/
             tar zxvf lua-${LUA_VERSION}.tar.gz
             pushd .
@@ -40,6 +41,7 @@ function build_lua_linux()
             popd
 
             tolua_top=${TARGET_ROOT}/tolua/linux-x86_64
+            rm -rf ${tolua_top}
             mkdir -p ${tolua_top}
             rm -rf tolua-${TOLUA_VERSION}/
             tar zxvf tolua-${TOLUA_VERSION}.tar.gz
@@ -65,6 +67,7 @@ function build_lua_macosx()
         x86_64)
             lua_top=${TARGET_ROOT}/lua/macosx-x86_64
             rm -rf ${lua_top}
+            mkdir -p ${lua_top}
             rm -rf lua-${LUA_VERSION}/
             tar zxvf lua-${LUA_VERSION}.tar.gz
             pushd .
@@ -75,6 +78,7 @@ function build_lua_macosx()
             popd
 
             tolua_top=${TARGET_ROOT}/tolua/macosx-x86_64
+            rm -rf ${tolua_top}
             mkdir -p ${tolua_top}
             rm -rf tolua-${TOLUA_VERSION}/
             tar zxvf tolua-${TOLUA_VERSION}.tar.gz
@@ -98,8 +102,9 @@ function build_lua_ios()
 
 function build_lua_mingw()
 {
-    local lua_top=lua_top=${TARGET_ROOT}/lua/mingw-${ARCH}
+    local lua_top=${TARGET_ROOT}/lua/mingw-${ARCH}
     rm -rf ${lua_top}
+    mkdir -p ${lua_top}
     rm -rf lua-${LUA_VERSION}/
     tar zxvf lua-${LUA_VERSION}.tar.gz
     pushd .
@@ -110,6 +115,7 @@ function build_lua_mingw()
     popd
 
     local tolua_top=${TARGET_ROOT}/tolua/mingw-${ARCH}
+    rm -rf ${tolua_top}
     mkdir -p ${tolua_top}
     rm -rf tolua-${TOLUA_VERSION}/
     tar zxvf tolua-${TOLUA_VERSION}.tar.gz
@@ -119,7 +125,6 @@ function build_lua_mingw()
     if [ $? -ne 0 ]; then echo -e "\033[31mBuild tolua Failed !!\033[0m"; exit 1; fi
     cp -R -a include lib bin ${tolua_top} 
     popd
-    ;;
 }
 
 function build_lua_android()
