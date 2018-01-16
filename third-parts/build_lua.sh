@@ -1,4 +1,5 @@
 #!/bin/bash
+#set -x
 
 LUA_VERSION=5.2.4
 TOLUA_VERSION=5.2.4
@@ -15,6 +16,12 @@ function Usage()
     echo "    ARCH: x86 x86_64 armv5 armv7 armv7s armv64"
 }
 
+function ModiyLuaLock()
+{
+    ../modify_lua_lock.sh
+    echo ''
+}
+
 function build_lua_linux()
 {
     local lua_top=
@@ -26,6 +33,7 @@ function build_lua_linux()
             tar zxvf lua-${LUA_VERSION}.tar.gz
             pushd .
             cd lua-${LUA_VERSION}/
+            ModiyLuaLock
             make linux && make install INSTALL_TOP=${lua_top}
             if [ $? -ne 0 ]; then echo "\033[31mBuild lua Failed !!\033[0m"; exit 1; fi
             popd
@@ -46,7 +54,6 @@ function build_lua_linux()
             echo -e "\033[31mBuild For ${OS}, Unsupportted ARCH: ${ARCH} !!\033[0m"; Usage; exit 1;
             ;;
     esac
-    echo 1
 }
 
 function build_lua_macosx()
@@ -60,6 +67,7 @@ function build_lua_macosx()
             tar zxvf lua-${LUA_VERSION}.tar.gz
             pushd .
             cd lua-${LUA_VERSION}/
+            ModiyLuaLock
             make macosx && make install INSTALL_TOP=${lua_top}
             if [ $? -ne 0 ]; then echo "\033[31mBuild lua Failed !!\033[0m"; exit 1; fi
             popd
