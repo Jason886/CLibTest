@@ -9,9 +9,9 @@ elif [ ${HOST} = Linux ]; then
     else
         AIENGINE=lib/aiengine/linux-x86
     fi
-elif [ ${HOST} = Mingw32 ]; then
+elif [ ${HOST:0:7} = MINGW32 ]; then
     AIENGINE=lib/aiengine/mingw-x86
-elif [ ${HOST} = Mingw64 ]; then
+elif [ ${HOST:0:7} =  MINGW64 ]; then
     AIENGINE=lib/aiengine/mingw-x86_64
 else
     echo "cannot run at ${HOST}"

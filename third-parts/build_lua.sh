@@ -25,6 +25,7 @@ function ModiyLuaLock()
 function build_lua_linux()
 {
     local lua_top=
+    local tolua_top=
     case ${ARCH} in
         x86_64)
             lua_top=${TARGET_ROOT}/lua/linux-x86_64
@@ -59,6 +60,7 @@ function build_lua_linux()
 function build_lua_macosx()
 {
     local lua_top=
+    local tolua_top=
     case ${ARCH} in
         x86_64)
             lua_top=${TARGET_ROOT}/lua/macosx-x86_64
@@ -96,7 +98,28 @@ function build_lua_ios()
 
 function build_lua_mingw()
 {
-    echo 1
+    local lua_top=lua_top=${TARGET_ROOT}/lua/mingw-${ARCH}
+    rm -rf ${lua_top}
+    rm -rf lua-${LUA_VERSION}/
+    tar zxvf lua-${LUA_VERSION}.tar.gz
+    pushd .
+    cd lua-${LUA_VERSION}/
+    ModiyLuaLock
+    make mingw && make install INSTALL_TOP=${lua_top}
+    if [ $? -ne 0 ]; then echo "\033[31mBuild lua Failed !!\033[0m"; exit 1; fi
+    popd
+
+    local tolua_top=${TARGET_ROOT}/tolua/mingw-${ARCH}
+    mkdir -p ${tolua_top}
+    rm -rf tolua-${TOLUA_VERSION}/
+    tar zxvf tolua-${TOLUA_VERSION}.tar.gz
+    pushd .
+    cd tolua-${TOLUA_VERSION}/
+    make tolua LUA=${lua_top}
+    if [ $? -ne 0 ]; then echo -e "\033[31mBuild tolua Failed !!\033[0m"; exit 1; fi
+    cp -R -a include lib bin ${tolua_top} 
+    popd
+    ;;
 }
 
 function build_lua_android()

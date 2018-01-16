@@ -10,9 +10,9 @@ elif [ ${HOST} = Linux ]; then
     else
         TOLUA=../lib/tolua/linux-x86/bin/tolua
     fi
-elif [ ${HOST} = Mingw32 ]; then
+elif [ ${HOST:0:7} = MINGW32 ]; then
     TOLUA=../lib/tolua/mingw-x86/bin/tolua
-elif [ ${HOST} = Mingw64 ]; then
+elif [ ${HOST:0:7} =  MINGW64 ]; then
     TOLUA=../lib/tolua/mingw-x86_64/bin/tolua
 else
     echo "cannot run at ${HOST}"
