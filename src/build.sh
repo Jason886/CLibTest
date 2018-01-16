@@ -27,6 +27,8 @@ AIENGINE=../lib/aiengine/${OS}-${ARCH}
 LIB_PATH="${LIB_PATH} -L${AIENGINE}"
 LIBS="${LIBS} -laiengine"
 
+./bind.sh
+
 gcc ${CFLAGS} -I. -c main.c -o main.o
 gcc ${CFLAGS} -I. -I${LUA}/include -I${TOLUA}/include -c test.c -o test.o
 gcc ${CFLAGS} -I. -I${LUA}/include -I${TOLUA}/include -c log.c -o log.o
