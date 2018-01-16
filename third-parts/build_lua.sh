@@ -19,7 +19,8 @@ function Usage()
 function ModiyLuaLock()
 {
     ../modify_lua_lock.sh
-    echo ''
+    return $?
+    #return 0
 }
 
 function build_lua_linux()
@@ -32,10 +33,11 @@ function build_lua_linux()
             rm -rf ${lua_top}
             mkdir -p ${lua_top}
             rm -rf lua-${LUA_VERSION}/
-            tar zxvf lua-${LUA_VERSION}.tar.gz
+            tar zxf lua-${LUA_VERSION}.tar.gz
             pushd .
             cd lua-${LUA_VERSION}/
             ModiyLuaLock
+            if [ $? -ne 0 ]; then echo "\033[31mBuild lua Failed !!\033[0m"; exit 1; fi
             make linux && make install INSTALL_TOP=${lua_top}
             if [ $? -ne 0 ]; then echo "\033[31mBuild lua Failed !!\033[0m"; exit 1; fi
             popd
@@ -44,7 +46,7 @@ function build_lua_linux()
             rm -rf ${tolua_top}
             mkdir -p ${tolua_top}
             rm -rf tolua-${TOLUA_VERSION}/
-            tar zxvf tolua-${TOLUA_VERSION}.tar.gz
+            tar zxf tolua-${TOLUA_VERSION}.tar.gz
             pushd .
             cd tolua-${TOLUA_VERSION}/
             sed -i "s/^LIB= /LIB= -ldl /g" config
@@ -69,10 +71,11 @@ function build_lua_macosx()
             rm -rf ${lua_top}
             mkdir -p ${lua_top}
             rm -rf lua-${LUA_VERSION}/
-            tar zxvf lua-${LUA_VERSION}.tar.gz
+            tar zxf lua-${LUA_VERSION}.tar.gz
             pushd .
             cd lua-${LUA_VERSION}/
             ModiyLuaLock
+            if [ $? -ne 0 ]; then echo "\033[31mBuild lua Failed !!\033[0m"; exit 1; fi
             make macosx && make install INSTALL_TOP=${lua_top}
             if [ $? -ne 0 ]; then echo "\033[31mBuild lua Failed !!\033[0m"; exit 1; fi
             popd
@@ -81,7 +84,7 @@ function build_lua_macosx()
             rm -rf ${tolua_top}
             mkdir -p ${tolua_top}
             rm -rf tolua-${TOLUA_VERSION}/
-            tar zxvf tolua-${TOLUA_VERSION}.tar.gz
+            tar zxf tolua-${TOLUA_VERSION}.tar.gz
             pushd .
             cd tolua-${TOLUA_VERSION}/
             make tolua LUA=${lua_top}
@@ -106,10 +109,11 @@ function build_lua_mingw()
     rm -rf ${lua_top}
     mkdir -p ${lua_top}
     rm -rf lua-${LUA_VERSION}/
-    tar zxvf lua-${LUA_VERSION}.tar.gz
+    tar zxf lua-${LUA_VERSION}.tar.gz
     pushd .
     cd lua-${LUA_VERSION}/
     ModiyLuaLock
+    if [ $? -ne 0 ]; then echo "\033[31mBuild lua Failed !!\033[0m"; exit 1; fi
     make mingw && make install INSTALL_TOP=${lua_top}
     if [ $? -ne 0 ]; then echo "\033[31mBuild lua Failed !!\033[0m"; exit 1; fi
     popd
@@ -118,7 +122,7 @@ function build_lua_mingw()
     rm -rf ${tolua_top}
     mkdir -p ${tolua_top}
     rm -rf tolua-${TOLUA_VERSION}/
-    tar zxvf tolua-${TOLUA_VERSION}.tar.gz
+    tar zxf tolua-${TOLUA_VERSION}.tar.gz
     pushd .
     cd tolua-${TOLUA_VERSION}/
     make tolua LUA=${lua_top}

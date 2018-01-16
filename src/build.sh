@@ -1,4 +1,4 @@
-#set -x
+set -x
 function Usage()
 {
     echo "Usage: ${0##*/} OS ARCH"
