@@ -81,6 +81,7 @@ int File_Read(File_t *f) {
     memset(f->readBuf, 0, f->bufSize);
     int rc = fread(f->readBuf, 1, f->bufSize, f->fp);
     f->nRead = rc;
+    printf("rc = %d\n", rc);
     return rc;
 }
 

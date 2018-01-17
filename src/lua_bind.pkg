@@ -1,5 +1,8 @@
 $#include "log.h"
 $#include "File.h"
+$#include "test.h"
+
+void SleepMs(int ms);
 
 void LOG_I(char *text);
 void LOG_W(char *text);

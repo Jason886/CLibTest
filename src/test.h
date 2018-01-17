@@ -8,6 +8,8 @@ extern "C" {
 
     int start(int argc, char **argv);
 
+    void SleepMs(int ms);
+
 
 #ifdef __cplusplus
 }

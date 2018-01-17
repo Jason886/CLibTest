@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <time.h>
 
 #include "lua.h"
 #include "lualib.h"
@@ -46,3 +48,6 @@ end:
 }
 
 
+void SleepMs(int ms) {
+    usleep(ms*1000);
+}

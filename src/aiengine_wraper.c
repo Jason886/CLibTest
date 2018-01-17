@@ -10,6 +10,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// !!! 所有tolua_error标红
+
 typedef struct {
     struct aiengine *egn;
     lua_State *L;
@@ -25,7 +27,6 @@ static int _callback(const void *usrdata, const char *id, int type, const void *
     cb_closure_t * cl = (cb_closure_t*) usrdata;
     aiengine_wraper_t *egn_w = cl->egn_w;
 
-    int rc = 0;
     int eof = 0;
 
     do {
@@ -51,8 +52,8 @@ static int _callback(const void *usrdata, const char *id, int type, const void *
 
     lua_State *L = lua_newthread(egn_w->L);
     if (!L) {
+        // !!! 打印错误并退出
         fprintf(stderr, "[ERR] luaL_newstate");
-        rc = -1;
         goto end;
     }
 
@@ -63,34 +64,29 @@ static int _callback(const void *usrdata, const char *id, int type, const void *
     lua_pushlightuserdata(L, (void *)message);
     lua_pushnumber(L, size);
 
-    if (lua_pcall(L, 5, 1, 0)) {
+    if (lua_pcall(L, 5, 0, 0)) {
         const char *err_msg = lua_tostring(L, -1);
         // !!! 标红显示
+        // 并推出
         fprintf(stderr, "%s\n", err_msg);
-        rc = -1;
         goto end;
     }
 
-    if (!lua_isnumber(L, -1)) {
-        lua_pop(L, 1);
-        rc = -1;
-        goto end;
-    }
-
-    rc = lua_tonumber(L, -1);
-    lua_pop(L, 1);
 end:
     if (eof) {
         luaL_unref(L, LUA_REGISTRYINDEX, cl->udRef);
         luaL_unref(L, LUA_REGISTRYINDEX, cl->cbRef);
         free(cl);
     }
-    return rc;
+    return 0;
 }
 
 static int _bind_aiengine_new(lua_State *L) {
     const char* cfg = tolua_tostring(L, 1, 0);
     struct aiengine *egn = aiengine_new(cfg);
+    if (!egn) {
+        return 0;
+    }
     aiengine_wraper_t *egn_w = malloc(sizeof *egn_w);
     if (egn_w) {
         egn_w->egn = egn;
@@ -123,15 +119,15 @@ static int _bind_aiengine_start(lua_State *L) {
         }
     }
 
-    lua_pushvalue(L, -1);
-    int udRef = luaL_ref(L, LUA_REGISTRYINDEX);
     lua_pushvalue(L, -2);
     int cbRef = luaL_ref(L, LUA_REGISTRYINDEX);
+    lua_pushvalue(L, -1);
+    int udRef = luaL_ref(L, LUA_REGISTRYINDEX);
 
     cb_closure_t * cl = malloc(sizeof *cl);
     memset(cl, 0, sizeof *cl);
-    cl->udRef = udRef;
     cl->cbRef = cbRef;
+    cl->udRef = udRef;
     cl->egn_w = egn_w;
 
     int ret = aiengine_start(egn_w->egn, param, id, _callback, (void*)cl);
@@ -140,7 +136,9 @@ static int _bind_aiengine_start(lua_State *L) {
     return 2;
 
 err:
-    tolua_error(L,"#ferror in function 'aiengine_start'.",&tolua_err);
+    fprintf(stderr, "\033[31m [ Lua Error ] \033[0m");
+    tolua_error(L, "#ferror in function 'aiengine_start'.", &tolua_err);
+    //tolua_error(L,"\033[31m#ferror in function 'aiengine_start\033[0m'.",&tolua_err);
     return 0;
 }
 

@@ -1,68 +1,89 @@
 local _M = {}
 
 function _M.Group_Run(group)
-        local input = group.input
-        local runCtx = {}
-        group.runCtx = runCtx
+    local rc = 0
+    local input = group.input
+    local runCtx = {}
+    group.runCtx = runCtx
 
-        local groupCopyName = group.copyIndex and ('(copy' .. group.copyIndex .. ')') or ''
+    local groupCopyName = group.copyIndex and ('(copy' .. group.copyIndex .. ')') or ''
+    print('[Group ' .. group.name .. groupCopyName .. ' Start]')
 
-        -- print('[Group ' .. group.name .. groupCopyName .. ' Start]')
+    runCtx.egn = aiengine_new(input.cfg)
+    if runCtx.egn == nil then
+        rc = -1
+        goto ret
+    end
 
-
-        --[[
-
-        runCtx.egn = aiengine_new(input.cfg)
-        if not runCtx.egn then
-                return -1
+    for i, v in ipairs(group.cases) do
+        if v.run then
+            local case_rc = v:run(group)
+            if case_rc ~= 0 then
+                rc = -1
+                goto ret
+            end
         end
-        --]]
+    end
 
-        for i, v in ipairs(group.cases) do
-                if v.run then
-                        local ret = v:run(group)
-                        if 0 ~= ret then
-                                return -1
-                        end
-                end
-        end
+::ret::
 
-        --[[
-
-        while (true) do
-                local allDone = true
-                for i, v in ipairs(group.cases) do
-                        if not v.state or
-                                (v.state ~= _G.CaseStSuc and v.state ~= _G.CaseStFail) then
-                                allDone = false
-                                break
-                        end
-                end
-                if allDone then
-                        break
-                end
-        end
-
+    if runCtx.egn ~= nil then
         aiengine_delete(runCtx.egn)
-        return 0
-        ]]
+        runCtx.egn = nil
+    end
 
-        -- print('[Group ' .. group.name .. groupCopyName .. ' End]')
-        return 0
+    if rc ~= 0 then
+        print('[Group ' .. group.name .. groupCopyName .. ' Failure]')
+    else
+        print('[Group ' .. group.name .. groupCopyName .. ' Finish]')
+    end
+    return rc
 end
 
 function _M.Case_Run(case, group)
-        local runCtx = group.runCtx
-        local input = case.input
+    local rc = 0
+    local runCtx = group.runCtx
+    local input = case.input
+    local egn_rc = 0
+    local nRead = 0
+    local file = nil
 
-        local groupCopyName = group.copyIndex and ('(copy' .. group.copyIndex .. ')') or ''
-        local caseCopyName = case.copyIndex and ('(copy' .. case.copyIndex .. ')') or ''
+    local groupCopyName = group.copyIndex and ('(copy' .. group.copyIndex .. ')') or ''
+    local caseCopyName = case.copyIndex and ('(copy' .. case.copyIndex .. ')') or ''
+    print('[Case ' .. group.name ..groupCopyName .. '.' .. case.name ..caseCopyName .. ' Start]')
 
-        print('[Case ' .. group.name ..groupCopyName .. '.' .. case.name ..caseCopyName .. ' Start]')
+    file = File_Open(input.audio_file, "r", 4096)
+    if not file then
+        rc = -1
+        goto ret
+    end
 
+    egn_rc = aiengine_start(runCtx.egn, input.param, nil, case.check, case)
+    if egn_rc ~= 0 then
+        aiengine_stop(runCtx.egn)
+        rc = -1
+        goto ret
+    end
 
-        print('[Case ' .. group.name .. groupCopyName .. '.' .. case.name ..caseCopyName .. ' End]')
-        return 0
+    nRead = File_Read(file)
+    while  nRead and nRead > 0 do
+        aiengine_feed(runCtx.egn, file.readBuf, file.nRead)
+        nRead = File_Read(file)
+    end
+
+    File_Close(file)
+
+    aiengine_stop(runCtx.egn)
+
+    SleepMs(10000)  -- 等待结果
+
+::ret::
+    if rc ~= 0 then
+        print('[Case ' .. group.name .. groupCopyName .. '.' .. case.name ..caseCopyName .. ' Failure]')
+    else
+        print('[Case ' .. group.name .. groupCopyName .. '.' .. case.name ..caseCopyName .. ' Finish]')
+    end
+    return rc
 end
 
 

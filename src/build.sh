@@ -21,7 +21,12 @@ LIBS="-llua -ltolua"
 HOST=`uname`
 if [ ${HOST} = Linux ]; then
     LIBS="${LIBS} -ldl -lm"
-fi 
+    CFLAGS="-D_GNU_SOURCE ${CFLAGS}"
+elif [ ${HOST} == Darwin ]; then 
+    CFLAGS="-D_GNU_SOURCE ${CFLAGS}"
+else
+    CFLAGS="-D_GNU_SOURCE ${CFLAGS}"
+fi
 
 AIENGINE=../lib/aiengine/${OS}-${ARCH}
 LIB_PATH="${LIB_PATH} -L${AIENGINE}"
@@ -30,7 +35,7 @@ LIBS="${LIBS} -laiengine"
 ./bind.sh
 
 gcc ${CFLAGS} -I. -c main.c -o main.o
-gcc ${CFLAGS} -I. -I${LUA}/include -I${TOLUA}/include -c test.c -o test.o
+gcc ${CFLAGS} -D_GNU_SOURCE -I. -I${LUA}/include -I${TOLUA}/include -c test.c -o test.o
 gcc ${CFLAGS} -I. -I${LUA}/include -I${TOLUA}/include -c log.c -o log.o
 gcc ${CFLAGS} -I. -I${LUA}/include -I${TOLUA}/include -c File.c -o File.o
 gcc ${CFLAGS} -I. -I${LUA}/include -I${TOLUA}/include -c cJSON.c -o cJSON.o
